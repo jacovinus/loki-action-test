@@ -5,7 +5,6 @@ const { createLogger, format } = require("winston");
 const LokiTransport = require("winston-loki");
 const githubAPIUrl = "https://api.github.com";
 const { combine, timestamp, label, printf } = format;
-const { parse_rfc3339, parse_nanos } = require("@qxip/chrono-parse-rfc3339");
 
 /**
  *
@@ -171,22 +170,24 @@ export async function run() {
       const logs = logger(j);
       const lines = await fetchLogs(client, repo, j);
       core.debug(`Fetched ${lines.length} lines for job ${j.name}`);
-      var regex = /(.*?)\s(.*)$/;
-      if (lines) {
-        for (const l of lines) {
-          try {
-            const line = l.match(regex);
-            //core.debug(`${line}`);
-            if (!line["1"] || (line["2"] && line["2"].length === 0)) return;
-            const s = parse_rfc3339(line["1"]) || Date.now();
-            const xlog = { timestamp: s, message: line["2"] };
-            core.debug(`${xlog}`);
-            logs.info(xlog);
-          } catch (e) {
-            const xlog = { timestamp: Date.now(), message: l };
-            logs.info(xlog);
-            core.warning(`parser error: ${e}`);
-          }
+      var regex = /^UTC\s(.*?)\s(.*)$/
+      var regnano = /\.(.*)Z$/
+      
+      for (const l of lines) {
+        try {
+          const line = l.match(regex);
+          if (!line[1] || (line[2] && line[2].length === 0)) return;
+          // Hack a nanosecond timestamp
+          const nano = parseInt(line[1].match(regnano)[1]) || 000000;
+          const seconds = parseInt(new Date(line[1]).getTime() / 1000);
+          const s = parseInt(seconds + nano.toString())
+          const xlog = { "timestamp": s, "message": line[2] }
+          core.debug(`${xlog}`);
+          logs.info(xlog);
+        } catch(e) { 
+          const xlog = { "timestamp": Date.now(), "message": l }
+          logs.info(xlog); 
+          core.warning(`parser error: ${e}`);
         }
         logs.clear();
       }
