@@ -29,3 +29,4 @@ jobs:
           repo-token: ${{ secrets.GITHUB_TOKEN }}
           endpoint: ${{ secrets.LOGQL_ENDPOINT || 'https://qryn.glitch.me' }}
           job-names: build
+          use-json: true #format JSON log lines
