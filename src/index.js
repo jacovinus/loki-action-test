@@ -152,7 +152,7 @@ export async function run() {
               type: "github",
             },
             host: endpoint || addresses[0],
-            format: winston.format.json(),
+            format: format.json(),
             json: true,
             batching: false,
             gracefulShutdown: true,
