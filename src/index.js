@@ -171,7 +171,7 @@ export async function run() {
       const logs = logger(j);
       const lines = await fetchLogs(client, repo, j);
       core.debug(`Fetched ${lines.length} lines for job ${j.name}`);
-      const regex = /^(?<timestamp>.*?)\s(?<logline>.*)$/;
+      const regex = /(?<timestamp>.*?)\s(?<logline>.*)$/;
       const regnano = /\.(?<nanosec>.*)Z$/;
 
       for (const l of lines) {
@@ -187,12 +187,12 @@ export async function run() {
               parseInt(timestamp.match(regnano).groups.nanosec) || "000000";
             const seconds = parseInt(new Date(timestamp).getTime() / 1000);
             const s = parseInt(seconds + nano.toString());
-            const xlog = `{timestamp: ${s}, message: ${logline}}`;
+            const xlog = `{timestamp:${s},message:${logline}}`;
             core.debug(xlog);
             logs.info(xlog);
           }
         } catch (e) {
-          const xlog = `{ timestamp: ${Date.now()}, message: ${l} }`;
+          const xlog = `{timestamp:${Date.now()}, message:${l}}`;
           logs.info(xlog);
           core.warning(`parser error: ${e}`);
         }
