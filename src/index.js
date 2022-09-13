@@ -178,14 +178,13 @@ export async function run() {
 
           if (!line[1] || (line[2] && line[2].length === 0)) return;
           const s = parse_rfc3339(line[1]) || Date.now();
-          const xlog = { "timestamp": s, "message": line[2] }
+          const xlog = { timestamp: s, message: line[2] };
           core.debug(`${xlog}`);
           logs.info(xlog);
-        } catch(e) { 
-          const xlog = { "timestamp": Date.now(), "message": l }
-          logs.info(xlog); 
+        } catch (e) {
+          const xlog = { timestamp: Date.now(), message: l };
+          logs.info(xlog);
           core.warning(`parser error: ${e}`);
-
         }
       }
       logs.clear();
