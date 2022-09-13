@@ -169,18 +169,18 @@ export async function run() {
       const logs = logger(j);
       const lines = await fetchLogs(client, repo, j);
       core.debug(`Fetched ${lines.length} lines for job ${j.name}`);
-      var regex = /^UTC\s(.*?)\s(.*)$/
+      var regex = /^UTC\s(.*?)\s(.*)$/;
       for (const l of lines) {
         try {
           const line = l.match(regex);
-          if (!line[1] || line[2] && line[2].length == 0) return;
+          if (!line[1] || (line[2] && line[2].length == 0)) return;
           const s = parse_rfc3339(line[1]);
-          const xlog = { "timestamp": s || Date.now(), "message": line[2] || '' }
+          const xlog = { timestamp: s || Date.now(), message: line[2] || "" };
           core.debug(`${xlog}`);
           logs.info(xlog);
-        } catch(e) { 
+        } catch (e) {
           core.debug(`${l}`);
-          logs.info(l); 
+          logs.info(l);
         }
       }
       logs.clear();
