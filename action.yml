@@ -23,9 +23,6 @@ inputs:
   partition:
     required: false
     description: optional partition id
-  use-json:
-    required: false
-    description: format JSON log lines
 runs:
   using: 'node16'
   main: 'dist/index.js'
