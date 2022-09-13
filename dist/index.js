@@ -26627,7 +26627,6 @@ async function run() {
               type: "github",
             },
             host: endpoint || addresses[0],
-            format: format.json(),
             json: true,
             batching: false,
             gracefulShutdown: true,
@@ -26669,7 +26668,7 @@ async function run() {
             logs.info(xlog);
           }
         } catch (e) {
-          const xlog = `{timestamp:${Date.now()}, message:"${l}}"`;
+          const xlog = `{timestamp:${Date.now()},message:"${l}"}`;
           logs.info(xlog);
           core.warning(`parser error: ${e}`);
         }
