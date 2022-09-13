@@ -26659,12 +26659,12 @@ async function run() {
             const nano = parseInt(line[1].match(regnano)[1]) || "000000";
             const seconds = parseInt(new Date(line[1]).getTime() / 1000);
             const s = parseInt(seconds + nano.toString());
-            const xlog = `{ timestamp: ${s}, message: ${line[2]} }`;
+            const xlog = String(`{ timestamp: ${s}, message: ${line[2]} }`);
             core.debug(xlog);
             logs.info(xlog);
           }
         } catch (e) {
-          const xlog = `{ timestamp: ${Date.now()}, message: ${l} }`;
+          const xlog = String(`{ timestamp: ${Date.now()}, message: ${l} }`);
           logs.info(xlog);
           core.warning(`parser error: ${e}`);
         }
