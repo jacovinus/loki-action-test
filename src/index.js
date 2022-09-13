@@ -170,9 +170,9 @@ export async function run() {
       const logs = logger(j);
       const lines = await fetchLogs(client, repo, j);
       core.debug(`Fetched ${lines.length} lines for job ${j.name}`);
-      const regex = /^(.*?)\s(.*)$/
-      const regnano = /\.(.*)Z$/
-      
+      const regex = /^(.*?)\s(.*)$/;
+      const regnano = /\.(.*)Z$/;
+
       for (const l of lines) {
         try {
           const line = l.match(regex);
