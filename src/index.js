@@ -153,6 +153,7 @@ export async function run() {
             },
             host: endpoint || addresses[0],
             json: true,
+            format: format.json(),
             batching: false,
             gracefulShutdown: true,
             timeout: 0,
@@ -189,7 +190,9 @@ export async function run() {
             //parseInt(timestamp.match(regnano).groups.nanosec) || "000000";
             const seconds = parseInt(new Date(timestamp).getTime() / 1000);
             const s = parseInt(seconds + nano.toString());
-            const xlog = `{timestamp:${s},message:${JSON.stringify(log)}}`;
+            const xlog = `{timestamp:${JSON.stringify(
+              s
+            )},message:${JSON.stringify(log)}}`;
             core.debug(xlog);
             logs.info(xlog);
           }
