@@ -26646,23 +26646,25 @@ async function run() {
       const logs = logger(j);
       const lines = await fetchLogs(client, repo, j);
       core.debug(`Fetched ${lines.length} lines for job ${j.name}`);
-      const regex = /(?<timestamp>.*?)\s(?<logline>.*)$/;
-      const regnano = /\.(?<nanosec>.*)Z$/;
+      const gh_log_regex =
+        /^\s?(?<timestamp>((19|20)[0-9][0-9])[-](0[1-9]|1[012])[-](0[1-9]|[12][0-9]|3[01])[T]([01][1-9]|[2][0-3])[:]([0-5][0-9])[:]([0-5][0-9])[.](?<nanosec>[0-9][0-9][0-9][0-9][0-9][0-9][0-9])[Z])\s(?<log>.*){0,1}/;
+      // const regex = /(?<timestamp>.*?)\s(?<logline>.*)$/;
+      // const regnano = /\.(?<nanosec>.*)Z$/;
 
       for (const l of lines) {
         try {
-          const line = await l.match(regex);
+          const line = await l.match(gh_log_regex);
           core.debug(JSON.stringify(line.groups));
-          if (!line?.groups?.timestamp && !line?.groups?.logline) {
+          if (!line?.groups?.timestamp && !line?.groups?.log) {
             core.error("no lines match");
             //  core.debug("no lines match");
           } else {
-            const { timestamp, logline } = line?.groups;
-            const nano =
-              parseInt(timestamp.match(regnano).groups.nanosec) || "000000";
+            const { timestamp, log, nanosec } = line?.groups;
+            const nano = parseInt(nanosec) || "000000";
+            //parseInt(timestamp.match(regnano).groups.nanosec) || "000000";
             const seconds = parseInt(new Date(timestamp).getTime() / 1000);
             const s = parseInt(seconds + nano.toString());
-            const xlog = `{timestamp:${s},message:${logline}}`;
+            const xlog = `{timestamp:${s},message:${log}}`;
             core.debug(xlog);
             logs.info(xlog);
           }
