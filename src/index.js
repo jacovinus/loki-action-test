@@ -154,7 +154,9 @@ export async function run() {
             },
             host: endpoint || addresses[0],
             json: true,
+            batching:false,
             gracefulShutdown: true,
+            timeout:0,
             onConnectionError: onConnectionError,
             lokiBasicAuth: lokiBasicAuth(),
           }),
@@ -183,6 +185,7 @@ export async function run() {
           core.debug(`${xlog}`);
           logs.info(xlog);
         } catch (e) {
+          core.debug(`Fetched ${lines.length} lines for job ${j.name}`);
           core.debug(`${l}`);
           logs.info(l);
         }
