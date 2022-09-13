@@ -4379,6 +4379,245 @@ utf8.write = function utf8_write(string, buffer, offset) {
 
 /***/ }),
 
+/***/ 1060:
+/***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
+
+let imports = {};
+imports['__wbindgen_placeholder__'] = module.exports;
+let wasm;
+const { TextDecoder, TextEncoder } = __nccwpck_require__(1669);
+
+const heap = new Array(32).fill(undefined);
+
+heap.push(undefined, null, true, false);
+
+function getObject(idx) { return heap[idx]; }
+
+let heap_next = heap.length;
+
+function dropObject(idx) {
+    if (idx < 36) return;
+    heap[idx] = heap_next;
+    heap_next = idx;
+}
+
+function takeObject(idx) {
+    const ret = getObject(idx);
+    dropObject(idx);
+    return ret;
+}
+
+let cachedTextDecoder = new TextDecoder('utf-8', { ignoreBOM: true, fatal: true });
+
+cachedTextDecoder.decode();
+
+let cachegetUint8Memory0 = null;
+function getUint8Memory0() {
+    if (cachegetUint8Memory0 === null || cachegetUint8Memory0.buffer !== wasm.memory.buffer) {
+        cachegetUint8Memory0 = new Uint8Array(wasm.memory.buffer);
+    }
+    return cachegetUint8Memory0;
+}
+
+function getStringFromWasm0(ptr, len) {
+    return cachedTextDecoder.decode(getUint8Memory0().subarray(ptr, ptr + len));
+}
+
+let WASM_VECTOR_LEN = 0;
+
+let cachedTextEncoder = new TextEncoder('utf-8');
+
+const encodeString = (typeof cachedTextEncoder.encodeInto === 'function'
+    ? function (arg, view) {
+    return cachedTextEncoder.encodeInto(arg, view);
+}
+    : function (arg, view) {
+    const buf = cachedTextEncoder.encode(arg);
+    view.set(buf);
+    return {
+        read: arg.length,
+        written: buf.length
+    };
+});
+
+function passStringToWasm0(arg, malloc, realloc) {
+
+    if (realloc === undefined) {
+        const buf = cachedTextEncoder.encode(arg);
+        const ptr = malloc(buf.length);
+        getUint8Memory0().subarray(ptr, ptr + buf.length).set(buf);
+        WASM_VECTOR_LEN = buf.length;
+        return ptr;
+    }
+
+    let len = arg.length;
+    let ptr = malloc(len);
+
+    const mem = getUint8Memory0();
+
+    let offset = 0;
+
+    for (; offset < len; offset++) {
+        const code = arg.charCodeAt(offset);
+        if (code > 0x7F) break;
+        mem[ptr + offset] = code;
+    }
+
+    if (offset !== len) {
+        if (offset !== 0) {
+            arg = arg.slice(offset);
+        }
+        ptr = realloc(ptr, len, len = offset + arg.length * 3);
+        const view = getUint8Memory0().subarray(ptr + offset, ptr + len);
+        const ret = encodeString(arg, view);
+
+        offset += ret.written;
+    }
+
+    WASM_VECTOR_LEN = offset;
+    return ptr;
+}
+
+let cachegetInt32Memory0 = null;
+function getInt32Memory0() {
+    if (cachegetInt32Memory0 === null || cachegetInt32Memory0.buffer !== wasm.memory.buffer) {
+        cachegetInt32Memory0 = new Int32Array(wasm.memory.buffer);
+    }
+    return cachegetInt32Memory0;
+}
+/**
+* @param {string} s
+* @returns {string}
+*/
+module.exports.parse_rfc3339 = function(s) {
+    try {
+        const retptr = wasm.__wbindgen_add_to_stack_pointer(-16);
+        var ptr0 = passStringToWasm0(s, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
+        var len0 = WASM_VECTOR_LEN;
+        wasm.parse_rfc3339(retptr, ptr0, len0);
+        var r0 = getInt32Memory0()[retptr / 4 + 0];
+        var r1 = getInt32Memory0()[retptr / 4 + 1];
+        return getStringFromWasm0(r0, r1);
+    } finally {
+        wasm.__wbindgen_add_to_stack_pointer(16);
+        wasm.__wbindgen_free(r0, r1);
+    }
+};
+
+/**
+* @param {string} s
+* @returns {string}
+*/
+module.exports.parse_nanos = function(s) {
+    try {
+        const retptr = wasm.__wbindgen_add_to_stack_pointer(-16);
+        var ptr0 = passStringToWasm0(s, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
+        var len0 = WASM_VECTOR_LEN;
+        wasm.parse_nanos(retptr, ptr0, len0);
+        var r0 = getInt32Memory0()[retptr / 4 + 0];
+        var r1 = getInt32Memory0()[retptr / 4 + 1];
+        return getStringFromWasm0(r0, r1);
+    } finally {
+        wasm.__wbindgen_add_to_stack_pointer(16);
+        wasm.__wbindgen_free(r0, r1);
+    }
+};
+
+/**
+* @param {string} s
+* @returns {string}
+*/
+module.exports.parse_micros = function(s) {
+    try {
+        const retptr = wasm.__wbindgen_add_to_stack_pointer(-16);
+        var ptr0 = passStringToWasm0(s, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
+        var len0 = WASM_VECTOR_LEN;
+        wasm.parse_micros(retptr, ptr0, len0);
+        var r0 = getInt32Memory0()[retptr / 4 + 0];
+        var r1 = getInt32Memory0()[retptr / 4 + 1];
+        return getStringFromWasm0(r0, r1);
+    } finally {
+        wasm.__wbindgen_add_to_stack_pointer(16);
+        wasm.__wbindgen_free(r0, r1);
+    }
+};
+
+/**
+* @returns {string}
+*/
+module.exports.now_rfc3339 = function() {
+    try {
+        const retptr = wasm.__wbindgen_add_to_stack_pointer(-16);
+        wasm.now_rfc3339(retptr);
+        var r0 = getInt32Memory0()[retptr / 4 + 0];
+        var r1 = getInt32Memory0()[retptr / 4 + 1];
+        return getStringFromWasm0(r0, r1);
+    } finally {
+        wasm.__wbindgen_add_to_stack_pointer(16);
+        wasm.__wbindgen_free(r0, r1);
+    }
+};
+
+/**
+* @returns {string}
+*/
+module.exports.now = function() {
+    try {
+        const retptr = wasm.__wbindgen_add_to_stack_pointer(-16);
+        wasm.now(retptr);
+        var r0 = getInt32Memory0()[retptr / 4 + 0];
+        var r1 = getInt32Memory0()[retptr / 4 + 1];
+        return getStringFromWasm0(r0, r1);
+    } finally {
+        wasm.__wbindgen_add_to_stack_pointer(16);
+        wasm.__wbindgen_free(r0, r1);
+    }
+};
+
+function addHeapObject(obj) {
+    if (heap_next === heap.length) heap.push(heap.length + 1);
+    const idx = heap_next;
+    heap_next = heap[idx];
+
+    heap[idx] = obj;
+    return idx;
+}
+
+module.exports.__wbg_new0_57a6a2c2aaed3fc5 = function() {
+    var ret = new Date();
+    return addHeapObject(ret);
+};
+
+module.exports.__wbg_getTime_f8ce0ff902444efb = function(arg0) {
+    var ret = getObject(arg0).getTime();
+    return ret;
+};
+
+module.exports.__wbindgen_object_drop_ref = function(arg0) {
+    takeObject(arg0);
+};
+
+module.exports.__wbg_getTimezoneOffset_41211a984662508b = function(arg0) {
+    var ret = getObject(arg0).getTimezoneOffset();
+    return ret;
+};
+
+module.exports.__wbindgen_throw = function(arg0, arg1) {
+    throw new Error(getStringFromWasm0(arg0, arg1));
+};
+
+const path = __nccwpck_require__.ab + "chrono_parse_rfc3339_bg.wasm";
+const bytes = __nccwpck_require__(5747).readFileSync(__nccwpck_require__.ab + "chrono_parse_rfc3339_bg.wasm");
+
+const wasmModule = new WebAssembly.Module(bytes);
+const wasmInstance = new WebAssembly.Instance(wasmModule, imports);
+wasm = wasmInstance.exports;
+module.exports.__wasm = wasm;
+
+
+
+/***/ }),
+
 /***/ 4649:
 /***/ ((module) => {
 
@@ -26480,6 +26719,8 @@ const { createLogger, format } = __nccwpck_require__(4158);
 const LokiTransport = __nccwpck_require__(4490);
 const githubAPIUrl = "https://api.github.com";
 const { combine, timestamp, label, printf } = format;
+const { parse_rfc3339, parse_nanos } = __nccwpck_require__(1060);
+
 /**
  *
  * @param {*} ghToken
@@ -26626,7 +26867,10 @@ async function run() {
               type: "github",
             },
             host: endpoint || addresses[0],
+            json: true,
+            batching: false,
             gracefulShutdown: true,
+            timeout: 0,
             onConnectionError: onConnectionError,
             lokiBasicAuth: lokiBasicAuth(),
           }),
@@ -26641,13 +26885,29 @@ async function run() {
       const logs = logger(j);
       const lines = await fetchLogs(client, repo, j);
       core.debug(`Fetched ${lines.length} lines for job ${j.name}`);
-      for (const l of lines) {
-        core.debug(`${l}`);
-        logs.info(l);
+      var regex = /(.*?)\s(.*)$/;
+      if (lines) {
+        for (const l of lines) {
+          try {
+            const line = l.match(regex);
+            //core.debug(`${line}`);
+            if (!line["1"] || (line["2"] && line["2"].length === 0)) return;
+            const s = parse_rfc3339(line["1"]) || Date.now();
+            const xlog = { timestamp: s, message: line["2"] };
+            core.debug(`${xlog}`);
+            logs.info(xlog);
+          } catch (e) {
+            const xlog = { timestamp: Date.now(), message: l };
+            logs.info(xlog);
+            core.warning(`parser error: ${e}`);
+          }
+        }
+        logs.clear();
       }
-      logs.clear();
     }
   } catch (e) {
+    logs.info(e);
+    logs.clear();
     core.setFailed(`Run failed: ${e}`);
   }
 }

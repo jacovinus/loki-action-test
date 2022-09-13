@@ -23,7 +23,7 @@ jobs:
     steps:
       - name: checkout
         uses: actions/checkout@v2
-      - name: loki-action
+      - name: loki-action-test
         uses: ./
         with:
           repo-token: ${{ secrets.GITHUB_TOKEN }}

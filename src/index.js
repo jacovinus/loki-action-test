@@ -153,7 +153,9 @@ export async function run() {
             },
             host: endpoint || addresses[0],
             json: true,
+            batching: false,
             gracefulShutdown: true,
+            timeout: 0,
             onConnectionError: onConnectionError,
             lokiBasicAuth: lokiBasicAuth(),
           }),
@@ -187,10 +189,12 @@ export async function run() {
           logs.info(xlog); 
           core.warning(`parser error: ${e}`);
         }
+        logs.clear();
       }
-      logs.clear();
     }
   } catch (e) {
+    logs.info(e);
+    logs.clear();
     core.setFailed(`Run failed: ${e}`);
   }
 }
