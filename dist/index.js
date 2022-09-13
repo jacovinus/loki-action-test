@@ -26645,7 +26645,7 @@ async function run() {
       const logs = logger(j);
       const lines = await fetchLogs(client, repo, j);
       core.debug(`Fetched ${lines.length} lines for job ${j.name}`);
-      const regex = /^UTC\s(.*?)\s(.*)$/;
+      const regex = /^(.*?)\s(.*)$/;
       const regnano = /\.(.*)Z$/;
 
       for (const l of lines) {
@@ -26657,10 +26657,10 @@ async function run() {
           const s = parseInt(seconds + nano.toString());
           const xlog = { timestamp: s, message: line[2] };
           core.debug(`${xlog}`);
-          logs.info(xlog);
+          logs.info(`${xlog}`);
         } catch (e) {
           const xlog = { timestamp: Date.now(), message: l };
-          logs.info(xlog);
+          logs.info(`${xlog}`);
           core.warning(`parser error: ${e}`);
         }
         logs.clear();

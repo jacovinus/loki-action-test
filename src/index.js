@@ -179,13 +179,13 @@ export async function run() {
           if (!line[1] || (line[2] && line[2].length === 0)) return;
           const nano = parseInt(line[1].match(regnano)[1]) || "000000";
           const seconds = parseInt(new Date(line[1]).getTime() / 1000);
-          const s = parseInt(seconds + nano.toString());;
+          const s = parseInt(seconds + nano.toString());
           const xlog = { timestamp: s, message: line[2] };
           core.debug(`${xlog}`);
-          logs.info(xlog);
+          logs.info(`${xlog}`);
         } catch (e) {
           const xlog = { timestamp: Date.now(), message: l };
-          logs.info(xlog);
+          logs.info(`${xlog}`);
           core.warning(`parser error: ${e}`);
         }
         logs.clear();
