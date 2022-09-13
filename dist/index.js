@@ -26479,7 +26479,9 @@ const HttpClient = __nccwpck_require__(9925)/* .HttpClient */ .eN;
 const { createLogger, format } = __nccwpck_require__(4158);
 const LokiTransport = __nccwpck_require__(4490);
 const githubAPIUrl = "https://api.github.com";
-const { combine, timestamp, label, printf } = format;
+
+const gh_log_regex =
+  /^\s?(?<timestamp>((19|20)[0-9][0-9])[-](0[1-9]|1[012])[-](0[1-9]|[12][0-9]|3[01])[T]([01][1-9]|[2][0-3])[:]([0-5][0-9])[:]([0-5][0-9])[.](?<nanosec>[0-9][0-9][0-9][0-9][0-9][0-9][0-9])[Z])\s(?<log>.*){0,1}/;
 
 /**
  *
@@ -26584,8 +26586,6 @@ async function run() {
     const username = core.getInput("username", { required: false });
     // logql pass
     const password = core.getInput("password", { required: false });
-    // JSON format
-    const formatJSON = core.getInput("use-json", { required: false });
 
     // Ensure either endpoint or addresses are set
     if (endpoint === "" && addresses.length === 0) {
@@ -26602,8 +26602,6 @@ async function run() {
     const repo = process.env["GITHUB_REPOSITORY"] || "";
     core.debug(`Allow listing ${allowList.length} jobs in repo ${repo}`);
     const jobs = await fetchJobs(client, repo, workflowId, allowList);
-    const gh_log_regex =
-      /^\s?(?<timestamp>((19|20)[0-9][0-9])[-](0[1-9]|1[012])[-](0[1-9]|[12][0-9]|3[01])[T]([01][1-9]|[2][0-3])[:]([0-5][0-9])[:]([0-5][0-9])[.](?<nanosec>[0-9][0-9][0-9][0-9][0-9][0-9][0-9])[Z])\s(?<log>.*){0,1}/;
 
     const onConnectionError = (err) => {
       core.debug("Error at connecting with logs endpoint\n", err);
@@ -26615,18 +26613,8 @@ async function run() {
       return "";
     };
 
-    const lokiFormat = printf(({ level, message, label, timestamp }) => {
-      const line = message.match(gh_log_regex);
-      const { log, timestamp: ts, nanosec } = line?.groups;
-      const nano = parseInt(nanosec) || "000000";
-      const seconds = parseInt(new Date(timestamp).getTime() / 1000);
-      const s = parseInt(seconds + nano.toString());
-      return `timestamp:${s} [${label}] ${level}: ${JSON.stringify(log)}`;
-    });
-
     const options = (job) => {
       return {
-        // format: combine(label({ type: "github" }), timestamp(), lokiFormat),
         transports: [
           new LokiTransport({
             labels: {
@@ -26640,9 +26628,6 @@ async function run() {
             batching: false,
             gracefulShutdown: true,
             timeout: 0,
-            format: formatJSON
-              ? format.json()
-              : combine(label({ type: "github" }), timestamp(), lokiFormat),
             onConnectionError: onConnectionError,
             lokiBasicAuth: lokiBasicAuth(),
           }),
@@ -26663,29 +26648,28 @@ async function run() {
       // const regnano = /\.(?<nanosec>.*)Z$/;
 
       for (const l of lines) {
-        // try {
-        //   const line = l.match(gh_log_regex);
-        //   core.debug(JSON.stringify(line.groups));
-        //   if (!line?.groups?.timestamp && !line?.groups?.log) {
-        //     core.error("no lines match");
-        //     return;
-        //   } else {
-        //     const { timestamp, log, nanosec } = line?.groups;
-        //     const nano = parseInt(nanosec) || "000000";
-        //     const seconds = parseInt(new Date(timestamp).getTime() / 1000);
-        //     const s = parseInt(seconds + nano.toString());
-        //     const logLine = JSON.stringify(log);
-        //     const xlog = `{timestamp:${s}, message:${logLine}}`;
-        //     logs.info(xlog);
-        //   }
-        // } catch (e) {
-        //   const xlog = `{timestamp:${Date.now()}, message:${JSON.stringify(
-        //     l
-        //   )}}`;
-        //   logs.info(xlog);
-        //   core.warning(`parser error: ${e}`);
-        // }
-        logs.info(l);
+        try {
+          const line = l.match(gh_log_regex);
+          core.debug(JSON.stringify(line.groups));
+          if (!line?.groups?.timestamp && !line?.groups?.log) {
+            core.error("no lines match");
+            return;
+          } else {
+            const { timestamp, log, nanosec } = line?.groups;
+            const nano = parseInt(nanosec) || "000000";
+            const seconds = parseInt(new Date(timestamp).getTime() / 1000);
+            const s = parseInt(seconds + nano.toString());
+            const logLine = JSON.stringify(log);
+            const xlog = `{timestamp:${s}, message:${logLine}}`;
+            logs.info(xlog);
+          }
+        } catch (e) {
+          const xlog = `{timestamp:${Date.now()}, message:${JSON.stringify(
+            l
+          )}}`;
+          logs.info(xlog);
+          core.warning(`parser error: ${e}`);
+        }
       }
       logs.clear();
     }

@@ -6,7 +6,7 @@ const LokiTransport = require("winston-loki");
 const githubAPIUrl = "https://api.github.com";
 
 const gh_log_regex =
-/^\s?(?<timestamp>((19|20)[0-9][0-9])[-](0[1-9]|1[012])[-](0[1-9]|[12][0-9]|3[01])[T]([01][1-9]|[2][0-3])[:]([0-5][0-9])[:]([0-5][0-9])[.](?<nanosec>[0-9][0-9][0-9][0-9][0-9][0-9][0-9])[Z])\s(?<log>.*){0,1}/;
+  /^\s?(?<timestamp>((19|20)[0-9][0-9])[-](0[1-9]|1[012])[-](0[1-9]|[12][0-9]|3[01])[T]([01][1-9]|[2][0-3])[:]([0-5][0-9])[:]([0-5][0-9])[.](?<nanosec>[0-9][0-9][0-9][0-9][0-9][0-9][0-9])[Z])\s(?<log>.*){0,1}/;
 
 /**
  *
@@ -153,7 +153,7 @@ export async function run() {
             batching: false,
             gracefulShutdown: true,
             timeout: 0,
-            onConnectionError: onConnectionError, 
+            onConnectionError: onConnectionError,
             lokiBasicAuth: lokiBasicAuth(),
           }),
         ],
