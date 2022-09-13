@@ -26889,6 +26889,7 @@ async function run() {
       for (const l of lines) {
         try {
           const line = l.match(regex);
+
           if (!line[1] || (line[2] && line[2].length == 0)) return;
 
           const s = parse_rfc3339(line[1]);
@@ -26899,7 +26900,10 @@ async function run() {
           core.debug(`${xlog}`);
           logs.info(xlog);
         } catch (e) {
+          console.log(e);
+          core.debug(`${e}`);
           core.debug(`${l}`);
+
           logs.info(l);
         }
       }
