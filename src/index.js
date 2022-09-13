@@ -171,7 +171,7 @@ export async function run() {
       const logs = logger(j);
       const lines = await fetchLogs(client, repo, j);
       core.debug(`Fetched ${lines.length} lines for job ${j.name}`);
-      var regex = /^UTC\s(.*?)\s(.*)$/;
+      var regex = /(.*?)\s(.*)$/;
       for (const l of lines) {
         try {
           const line = l.match(regex);
@@ -185,7 +185,6 @@ export async function run() {
           core.debug(`${xlog}`);
           logs.info(xlog);
         } catch (e) {
-          core.debug(`Fetched ${lines.length} lines for job ${j.name}`);
           core.debug(`${l}`);
           logs.info(l);
         }
