@@ -188,9 +188,10 @@ export async function run() {
             //parseInt(timestamp.match(regnano).groups.nanosec) || "000000";
             const seconds = parseInt(new Date(timestamp).getTime() / 1000);
             const s = parseInt(seconds + nano.toString());
-            const xlog = `{timestamp:${s},message:${JSON.stringify(log)}}`;
+            const xlog = `timestamp:${s},message:${log}`;
             core.debug(xlog);
-            logs.info(`${xlog}`);
+            logs.info(xlog);
+            logs.debug(xlog);
           }
         } catch (e) {
           const xlog = `{timestamp:${Date.now()},message:${JSON.stringify(l)}}`;
