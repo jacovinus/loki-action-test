@@ -26888,8 +26888,12 @@ async function run() {
         try {
           const line = l.match(regex);
           if (!line[1] || (line[2] && line[2].length == 0)) return;
+
           const s = parse_rfc3339(line[1]);
-          const xlog = { timestamp: s || Date.now(), message: line[2] || "" };
+          const xlog = {
+            timestamp: s || Date.now(),
+            message: line[2] + `timestamp: ${l.timestamp()}` || "",
+          };
           core.debug(`${xlog}`);
           logs.info(xlog);
         } catch (e) {
