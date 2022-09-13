@@ -176,20 +176,21 @@ export async function run() {
 
       for (const l of lines) {
         try {
-          const line = l.match(regex);
-
-          if (!line?.groups?.timestamp || !line?.groups?.logline) {
-            core.debug("no lines match");
-            return;
+          const line = await l.match(regex);
+          core.debug(JSON.stringify(line.groups));
+          if (!line?.groups?.timestamp && !line?.groups?.logline) {
+            core.error("no lines match");
+            //  core.debug("no lines match");
+          } else {
+            const { timestamp, logline } = line?.groups;
+            const nano =
+              parseInt(timestamp.match(regnano).groups.nanosec) || "000000";
+            const seconds = parseInt(new Date(timestamp).getTime() / 1000);
+            const s = parseInt(seconds + nano.toString());
+            const xlog = `{timestamp: ${s}, message: ${logline}}`;
+            core.debug(xlog);
+            logs.info(xlog);
           }
-          const { timestamp, logline } = line?.groups;
-          const nano =
-            parseInt(timestamp.match(regnano).groups.nanosec) || "000000";
-          const seconds = parseInt(new Date(timestamp).getTime() / 1000);
-          const s = parseInt(seconds + nano.toString());
-          const xlog = `{timestamp: ${s}, message: ${logline}}`;
-          core.debug(xlog);
-          logs.info(xlog);
         } catch (e) {
           const xlog = `{ timestamp: ${Date.now()}, message: ${l} }`;
           logs.info(xlog);
