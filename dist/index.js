@@ -26868,7 +26868,9 @@ async function run() {
             },
             host: endpoint || addresses[0],
             json: true,
+            batching: false,
             gracefulShutdown: true,
+            timeout: 0,
             onConnectionError: onConnectionError,
             lokiBasicAuth: lokiBasicAuth(),
           }),
@@ -26883,7 +26885,7 @@ async function run() {
       const logs = logger(j);
       const lines = await fetchLogs(client, repo, j);
       core.debug(`Fetched ${lines.length} lines for job ${j.name}`);
-      var regex = /^UTC\s(.*?)\s(.*)$/;
+      var regex = /(.*?)\s(.*)$/;
       for (const l of lines) {
         try {
           const line = l.match(regex);
