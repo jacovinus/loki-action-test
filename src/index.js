@@ -171,25 +171,27 @@ export async function run() {
       const logs = logger(j);
       const lines = await fetchLogs(client, repo, j);
       core.debug(`Fetched ${lines.length} lines for job ${j.name}`);
-      const regex = /^(.*?)\s(.*)$/;
-      const regnano = /\.(.*)Z$/;
+      const regex = /^(?<timestamp>.*?)\s(?<logline>.*)$/;
+      const regnano = /\.(?<nanosec>.*)Z$/;
 
       for (const l of lines) {
         try {
           const line = l.match(regex);
-          if (!line || !line?.[1] || (line?.[2] && line?.[2].length === 0)) {
-            code.debug("No lines match");
+
+          if (!line?.groups?.timestamp || !line?.groups?.logline) {
+            core.debug("no lines match");
             return;
-          } else {
-            const nano = parseInt(line[1].match(regnano)[1]) || "000000";
-            const seconds = parseInt(new Date(line[1]).getTime() / 1000);
-            const s = parseInt(seconds + nano.toString());
-            const xlog = String(`{ timestamp: ${s}, message: ${line[2]} }`);
-            core.debug(xlog);
-            logs.info(xlog);
           }
+          const { timestamp, logline } = line?.groups;
+          const nano =
+            parseInt(timestamp.match(regnano).groups.nanosec) || "000000";
+          const seconds = parseInt(new Date(timestamp).getTime() / 1000);
+          const s = parseInt(seconds + nano.toString());
+          const xlog = `{timestamp: ${s}, message: ${logline}}`;
+          core.debug(xlog);
+          logs.info(xlog);
         } catch (e) {
-          const xlog = String(`{ timestamp: ${Date.now()}, message: ${l} }`);
+          const xlog = `{ timestamp: ${Date.now()}, message: ${l} }`;
           logs.info(xlog);
           core.warning(`parser error: ${e}`);
         }
