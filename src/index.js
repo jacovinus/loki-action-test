@@ -197,8 +197,7 @@ export async function run() {
       }
     }
   } catch (e) {
-    logs.info(e);
-    logs.clear();
+    core.debug(`Error at process: ${e}`);
     core.setFailed(`Run failed: ${e}`);
   }
 }
