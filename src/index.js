@@ -195,8 +195,10 @@ export async function run() {
             logs.info(xlog);
           }
         } catch (e) {
-          const xlog = `{timestamp:${Date.now()},message:${JSON.stringify(l)}}`;
-          logs.info(`${xlog}`);
+          const xlog = `{timestamp:${Date.now()}, message:${JSON.stringify(
+            l
+          )}}`;
+          logs.info(xlog);
           core.warning(`parser error: ${e}`);
         }
       }
