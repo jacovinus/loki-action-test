@@ -172,24 +172,27 @@ export async function run() {
       const lines = await fetchLogs(client, repo, j);
       core.debug(`Fetched ${lines.length} lines for job ${j.name}`);
       var regex = /(.*?)\s(.*)$/;
-      for (const l of lines) {
-        try {
-          const line = l.match(regex);
-
-          if (!line[1] || (line[2] && line[2].length === 0)) return;
-          const s = parse_rfc3339(line[1]) || Date.now();
-          const xlog = { timestamp: s, message: line[2] };
-          core.debug(`${xlog}`);
-          logs.info(xlog);
-        } catch (e) {
-          const xlog = { timestamp: Date.now(), message: l };
-          logs.info(xlog);
-          core.warning(`parser error: ${e}`);
+      if (lines) {
+        for (const l of lines) {
+          try {
+            const line = l.match(regex);
+            if (!line[1] || (line[2] && line[2].length === 0)) return;
+            const s = parse_rfc3339(line[1]) || Date.now();
+            const xlog = { timestamp: s, message: line[2] };
+            core.debug(`${xlog}`);
+            logs.info(xlog);
+          } catch (e) {
+            const xlog = { timestamp: Date.now(), message: l };
+            logs.info(xlog);
+            core.warning(`parser error: ${e}`);
+          }
         }
+        logs.clear();
       }
-      logs.clear();
     }
   } catch (e) {
+    logs.info(e);
+    logs.clear();
     core.setFailed(`Run failed: ${e}`);
   }
 }
