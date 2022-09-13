@@ -177,10 +177,11 @@ export async function run() {
 
       for (const l of lines) {
         try {
-          const line = await l.match(gh_log_regex);
+          const line = l.match(gh_log_regex);
           core.debug(JSON.stringify(line.groups));
           if (!line?.groups?.timestamp && !line?.groups?.log) {
             core.error("no lines match");
+            return;
             //  core.debug("no lines match");
           } else {
             const { timestamp, log, nanosec } = line?.groups;
