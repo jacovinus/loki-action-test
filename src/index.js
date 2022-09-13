@@ -154,7 +154,9 @@ export async function run() {
             },
             host: endpoint || addresses[0],
             json: true,
+            batching: false,
             gracefulShutdown: true,
+            timeout: 0,
             onConnectionError: onConnectionError,
             lokiBasicAuth: lokiBasicAuth(),
           }),
@@ -169,10 +171,11 @@ export async function run() {
       const logs = logger(j);
       const lines = await fetchLogs(client, repo, j);
       core.debug(`Fetched ${lines.length} lines for job ${j.name}`);
-      var regex = /^UTC\s(.*?)\s(.*)$/
+      var regex = /(.*?)\s(.*)$/;
       for (const l of lines) {
         try {
           const line = l.match(regex);
+
           if (!line[1] || (line[2] && line[2].length === 0)) return;
           const s = parse_rfc3339(line[1]) || Date.now();
           const xlog = { "timestamp": s, "message": line[2] }
@@ -182,6 +185,7 @@ export async function run() {
           const xlog = { "timestamp": Date.now(), "message": l }
           logs.info(xlog); 
           core.warning(`parser error: ${e}`);
+
         }
       }
       logs.clear();

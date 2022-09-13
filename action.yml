@@ -1,4 +1,4 @@
-name: 'loki-action'
+name: 'loki-action-test'
 description: 'Send workflow logs to qryn/loki'
 author: 'Lorenzo Mangani'
 inputs:
