@@ -26621,13 +26621,14 @@ async function run() {
       const xlog = `${log}`;
       return xlog;
     });
-    const tsFmt = printf(({ message }) => {
-      const line = message.match(gh_log_regex);
+    const tsFmt = () =>
+      printf(({ message }) => {
+        const line = message.match(gh_log_regex);
 
-      const { timestamp } = line?.groups;
-      core.info(timestamp);
-      return timestamp;
-    });
+        const { timestamp } = line?.groups;
+        core.info(timestamp);
+        return timestamp;
+      });
 
     const options = (job) => {
       return {
