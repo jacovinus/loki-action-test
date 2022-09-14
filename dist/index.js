@@ -26678,7 +26678,9 @@ async function run() {
       // const regnano = /\.(?<nanosec>.*)Z$/;
       for (const l of lines) {
         try {
-          logs.info(l);
+          if (l && l.length > 0) {
+            logs.info(l);
+          }
         } catch (e) {
           logs.info(`Error: ${e}`);
           core.warning(`parser error: ${e}`);
