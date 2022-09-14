@@ -142,24 +142,28 @@ export async function run() {
     const lokiFmt = printf(({ message }) => {
       core.info(message);
       const line = message.match(gh_log_regex);
+      if (!line?.groups?.log) {
+        return message;
+      }
       const { log } = line?.groups;
       const xlog = `${log}`;
       return xlog;
     });
-    const tsFmt = () =>
-      printf(({ message }) => {
-        core.info(`${message} timestamp processing`);
-        const line = message.match(gh_log_regex);
 
-        const { timestamp } = line?.groups;
-        // const nano = parseInt(nanosec) || "000000";
-        const ts = parseInt(new Date(timestamp).getTime());
+    // const tsFmt = () =>
+    //   printf(({ message }) => {
+    //     core.info(`${message} timestamp processing`);
+    //     const line = message.match(gh_log_regex);
 
-        core.info(`${timestamp}`);
-        core.info(`${parseInt(s)}, ${typeof s}`);
+    //     const { timestamp } = line?.groups;
+    //     // const nano = parseInt(nanosec) || "000000";
+    //     const ts = parseInt(new Date(timestamp).getTime());
 
-        return ts;
-      });
+    //     core.info(`${timestamp}`);
+    //     core.info(`${parseInt(s)}, ${typeof s}`);
+
+    //     return ts;
+    //   });
 
     const options = (job) => {
       return {
@@ -176,7 +180,7 @@ export async function run() {
             batching: false,
             gracefulShutdown: true,
             format: lokiFmt,
-            timestamp: tsFmt,
+            // timestamp: tsFmt,
             timeout: 0,
             onConnectionError: onConnectionError,
             lokiBasicAuth: lokiBasicAuth(),
@@ -193,25 +197,20 @@ export async function run() {
       const logs = logger(j);
       const lines = await fetchLogs(client, repo, j);
       core.debug(`Fetched ${lines.length} lines for job ${j.name}`);
-
       // const regex = /(?<timestamp>.*?)\s(?<logline>.*)$/;
       // const regnano = /\.(?<nanosec>.*)Z$/;
-
       for (const l of lines) {
         try {
           logs.info(l);
         } catch (e) {
-          const xlog = `{timestamp:${Date.now()}, message:${JSON.stringify(
-            l
-          )}}`;
-          logs.info(xlog);
+          logs.info(`Error: ${e}`);
           core.warning(`parser error: ${e}`);
         }
       }
       logs.clear();
     }
   } catch (e) {
-    core.debug(`Error at process: ${e}`);
+    core.warning(`Error at process: ${e}`);
     core.setFailed(`Run failed: ${e}`);
   }
 }
