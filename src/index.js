@@ -173,6 +173,7 @@ export async function run() {
           new LokiTransport({
             labels: {
               job: job?.name,
+              job_id: job?.id,
               repo,
               workflowId,
               type: "github",
@@ -199,8 +200,6 @@ export async function run() {
       const logs = logger(j);
       const lines = await fetchLogs(client, repo, j);
       core.debug(`Fetched ${lines.length} lines for job ${j.name}`);
-      // const regex = /(?<timestamp>.*?)\s(?<logline>.*)$/;
-      // const regnano = /\.(?<nanosec>.*)Z$/;
       for (const l of lines) {
         try {
           if (l && l.length > 0) {
