@@ -26626,15 +26626,14 @@ async function run() {
         core.info(`${message} timestamp processing`);
         const line = message.match(gh_log_regex);
 
-        const { timestamp, nanosec } = line?.groups;
-        const nano = parseInt(nanosec) || "000000";
-        const seconds = parseInt(new Date(timestamp).getTime() / 1000);
-        const s = parseInt(seconds + nano.toString());
+        const { timestamp } = line?.groups;
+        // const nano = parseInt(nanosec) || "000000";
+        const ts = parseInt(new Date(timestamp).getTime());
 
         core.info(`${timestamp}`);
         core.info(`${parseInt(s)}, ${typeof s}`);
 
-        return parseInt(s);
+        return ts;
       });
 
     const options = (job) => {
