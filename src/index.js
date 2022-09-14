@@ -148,11 +148,18 @@ export async function run() {
     });
     const tsFmt = () =>
       printf(({ message }) => {
+        core.info(`${message} timestamp processing`);
         const line = message.match(gh_log_regex);
 
-        const { timestamp } = line?.groups;
-        core.info(timestamp);
-        return timestamp;
+        const { timestamp, nanosec } = line?.groups;
+        const nano = parseInt(nanosec) || "000000";
+        const seconds = parseInt(new Date(timestamp).getTime() / 1000);
+        const s = parseInt(seconds + nano.toString());
+
+        core.info(`${timestamp}`);
+        core.info(`${parseInt(s)}, ${typeof s}`);
+
+        return parseInt(s);
       });
 
     const options = (job) => {
