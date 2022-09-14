@@ -26615,7 +26615,9 @@ async function run() {
     };
 
     const lokiFmt = printf(({ message }) => {
-      core.info(message);
+      if (!message || message.length === 0) {
+        return;
+      }
       const line = message.match(gh_log_regex);
       if (!line?.groups?.log) {
         return message;
