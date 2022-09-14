@@ -26479,6 +26479,7 @@ const HttpClient = __nccwpck_require__(9925)/* .HttpClient */ .eN;
 const { createLogger, format } = __nccwpck_require__(4158);
 const LokiTransport = __nccwpck_require__(4490);
 const githubAPIUrl = "https://api.github.com";
+const { printf } = format;
 
 const gh_log_regex =
   /^\s?(?<timestamp>((19|20)[0-9][0-9])[-](0[1-9]|1[012])[-](0[1-9]|[12][0-9]|3[01])[T]([01][1-9]|[2][0-3])[:]([0-5][0-9])[:]([0-5][0-9])[.](?<nanosec>[0-9][0-9][0-9][0-9][0-9][0-9][0-9])[Z])\s(?<log>.*){0,1}/;
@@ -26613,6 +26614,28 @@ async function run() {
       return "";
     };
 
+    const lokiFmt = printf(({ message }) => {
+      const line = message.match(gh_log_regex);
+      if (!line?.groups?.log) {
+        core.error("no line match");
+        return;
+      } else {
+        const { log } = line?.groups;
+        const xlog = `${log}`;
+        return xlog;
+      }
+    });
+    const tsFmt = printf(({ message }) => {
+      const line = message.match(gh_log_regex);
+      if (!line.groups.timestamp) {
+        core.error("no timestamp match");
+        return;
+      } else {
+        const { timestamp: ts } = line?.groups;
+        return ts;
+      }
+    });
+
     const options = (job) => {
       return {
         transports: [
@@ -26627,6 +26650,8 @@ async function run() {
             json: true,
             batching: false,
             gracefulShutdown: true,
+            format: lokiFmt,
+            timestamp: tsFmt,
             timeout: 0,
             onConnectionError: onConnectionError,
             lokiBasicAuth: lokiBasicAuth(),
@@ -26649,20 +26674,7 @@ async function run() {
 
       for (const l of lines) {
         try {
-          const line = l.match(gh_log_regex);
-          core.debug(JSON.stringify(line.groups));
-          if (!line?.groups?.timestamp && !line?.groups?.log) {
-            core.error("no lines match");
-            return;
-          } else {
-            const { timestamp, log, nanosec } = line?.groups;
-            const nano = parseInt(nanosec) || "000000";
-            const seconds = parseInt(new Date(timestamp).getTime() / 1000);
-            const s = parseInt(seconds + nano.toString());
-            const logLine = JSON.stringify(log);
-            const xlog = `{timestamp:${s}, message:${logLine}}`;
-            logs.info(xlog);
-          }
+          logs.info(l);
         } catch (e) {
           const xlog = `{timestamp:${Date.now()}, message:${JSON.stringify(
             l
