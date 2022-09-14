@@ -140,25 +140,18 @@ export async function run() {
     };
 
     const lokiFmt = printf(({ message }) => {
+      core.info(message);
       const line = message.match(gh_log_regex);
-      if (!line?.groups?.log) {
-        core.error("no line match");
-        return;
-      } else {
-        const { log } = line?.groups;
-        const xlog = `${log}`;
-        return xlog;
-      }
+      const { log } = line?.groups;
+      const xlog = `${log}`;
+      return xlog;
     });
     const tsFmt = printf(({ message }) => {
       const line = message.match(gh_log_regex);
-      if (!line.groups.timestamp) {
-        core.error("no timestamp match");
-        return;
-      } else {
-        const { timestamp: ts } = line?.groups;
-        return ts;
-      }
+
+      const { timestamp } = line?.groups;
+      core.info(timestamp);
+      return timestamp;
     });
 
     const options = (job) => {
